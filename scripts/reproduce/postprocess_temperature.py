@@ -76,12 +76,24 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="Post-process temperature simulations")
-    parser.add_argument("--input", type=Path, default=Path("output/temperature"),
-                        help="Input directory with simulation results")
-    parser.add_argument("--output", type=Path, default=Path("output/cohesive_energy_vs_temperature.csv"),
-                        help="Output CSV file")
+    parser.add_argument("--input", type=Path, default=None,
+                        help="Input directory with simulation results (default: output/temperature from project root)")
+    parser.add_argument("--output", type=Path, default=None,
+                        help="Output CSV file (default: in input directory)")
     
     args = parser.parse_args()
+    
+    # Smart default: find output/temperature relative to script or use current dir
+    if args.input is None:
+        script_dir = Path(__file__).parent.parent.parent
+        default_input = script_dir / "output" / "temperature"
+        if default_input.exists():
+            args.input = default_input
+        else:
+            args.input = Path(".")
+    
+    if args.output is None:
+        args.output = args.input / "cohesive_energy_vs_temperature.csv"
     
     print("=" * 60)
     print("Post-Processing Temperature-Dependent Cohesive Energy")
