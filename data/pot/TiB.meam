@@ -1,0 +1,56 @@
+# Developed by Siamak Attarian (siamak-attarian@uiowa.edu)
+# For more information, see below article: 
+# "Development of a 2NN-MEAM potential for Ti-B system and studies of the temperature dependence of the nanohardness of TiB2"
+# References:
+# elt        lat     z       ielement     atwt
+# alpha      b0      b1      b2           b3    alat    esub    asub
+# t0         t1              t2           t3            rozero  ibar
+#
+
+rc = 5
+delr = 0.1
+augt1 = 0
+erose_form = 2
+ialloy = 2
+
+zbl(1,1) = 0
+nn2(1,1) = 1
+attrac(1,1) = 0.0
+repuls(1,1) = 0.0
+Cmin(1,1,1) = 0.164
+Cmax(1,1,1) = 2.377
+re(1,1) = 1.86
+
+zbl(2,2) = 0
+nn2(2,2) = 1
+attrac(2,2) = 0.0
+repuls(2,2) = 0.0
+Cmin(2,2,2) = 1
+Cmax(2,2,2) = 1.44
+Ec(2,2) = 4.87
+re(2,2) = 2.92
+
+rho0(1) = 1.737
+rho0(2) = 1
+
+zbl(1,2) = 0
+nn2(1,2) = 1
+Ec(1,2) = 5.521
+re(1,2) =2.288
+alpha(1,2) = 4.173
+attrac(1,2) = 0
+repuls(1,2) = 0
+Cmin(1,1,2) = 1.136
+Cmin(2,2,1) = 0.915
+Cmin(1,2,1) = 1.095
+Cmin(1,2,2) = 2.0
+Cmin(2,1,1) = 2.0
+Cmin(2,1,2) = 2.0
+Cmax(1,1,2) = 2.311
+Cmax(2,2,1) = 2.708
+Cmax(1,2,1) = 3.263
+Cmax(1,2,2) = 2.8
+Cmax(2,1,1) = 2.8
+Cmax(2,1,2) = 2.8
+lattce(1,2) = 'b1'
+

@@ -1,0 +1,33 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Cache
+.pytest_cache/
+.ruff_cache/
+
+# LAMMPS output files (should be in output/ or simulations/)
+/*.result
+/in.lammps
+/log.lammps
+/*.data
+
+# Simulation output (too large for git)
+output/
+simulations/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,473 @@
+FILE: 251212—项目绩效自评价—考核指标 1-1 金属基复合材料界面与缺陷计算模块技术报告-V2.docx
+================================================================================
+
+--- Document Statistics ---
+Paragraphs: 438
+Tables: 2
+Images: 15
+
+--- Full Content ---
+
+[TOC Heading]: 目 录
+[toc 1]: 一、 概述	1
+[toc 1]: 二、 研究目的及指标	2
+[toc 2]: 2.1	研究目的	2
+[toc 2]: 2.2	项目指标	2
+[toc 1]: 三、 研究内容	3
+[toc 2]: 3.1	模块介绍	3
+[toc 3]: 3.1.1 界面与缺陷构型静态优化松弛计算	3
+[toc 3]: 3.1.2 微动弹性带（NEB）计算	4
+[toc 3]: 3.1.3 界面与缺陷构型动态优化松弛计算	4
+[toc 3]: 3.1.4 常应变率加载计算	4
+[toc 3]: 3.1.5 常应力加载计算	5
+[toc 2]: 3.2	算例描述	5
+[toc 3]: 3.2.1 Al-Mg体系静态优化松弛模拟设置	5
+[toc 3]: 3.2.2 Al-Mg体系微动弹性带计算设置	6
+[toc 3]: 3.2.3 Ti/TiB2体系动态优化松弛模拟设置	7
+[toc 3]: 3.2.4 Ti/TiB2体系常应力加载模拟设置	8
+[toc 3]: 3.2.5 Ti/TiB2体系常应变率加载模拟设置	9
+[toc 1]: 四、 结论	10
+[toc 1]: 五、 附件	11
+[toc 2]: 5.1	《金属基复合材料原子尺度构型设计软件》著作权登记证书…………………………………………………..11
+[toc 2]: 5.2	《金属基复合材料原子尺度构型设计软件》第三方测评报告…………………………………………………..12
+[toc 1]: 六、 附表	20
+[toc 2]: 6.1	金属基复合材料中界面与缺陷计算模块源代码	20
+[Heading 1]: 概述
+[Normal]: 在金属基复合材料的微观结构调控与性能优化研究中，界面结合状态、缺陷演化规律及相关原子尺度作用机制是核心科学问题，而此类研究往往涉及海量界面构型（如增强体-基体界面、反应层-基体界面）与缺陷类型（如位错、空位、裂纹）的原子尺度计算需求。传统LAMMPS开源程序参数输入文件需人工编写，存在流程繁琐、易出错、效率低下且参数一致性难以保证等问题，严重制约了计算研究的规模化与精准化推进。为此，本研究针对性开发金属基复合材料界面与缺陷专用计算模块，核心功能为自动化生成适配LAMMPS开源程序的分子静力学（MS）与分子动力学（MD）计算参数输入文件，实现界面与缺陷相关原子尺度计算的全流程标准化、自动化调控，为高效解析金属基复合材料界面与缺陷的原子尺度行为机制提供关键技术支撑。
+[Normal]: 该计算模块基于金属基复合材料界面与缺陷的结构特征及计算需求，构建了标准化的参数化建模与计算流程，通过模块化设计实现多类核心计算功能的精准适配，分别实现界面与缺陷构型的静态优化松弛、微动弹性带计算、动态优化松弛、常应变率加载及常应力加载。该计算模块有效解决了金属基复合材料界面与缺陷原子尺度计算中输入文件编写效率低、参数一致性差、流程不规范等技术瓶颈，实现了从构型构建、参数配置到计算执行的全流程自动化调控。通过标准化的输入文件生成流程，大幅提升了计算效率与数据可靠性，可支撑大规模、多工况下的界面与缺陷原子尺度计算研究，为深入揭示金属基复合材料微观结构与宏观性能的关联机制提供了强有力的计算技术支撑。
+[Heading 1]: 研究目的及指标
+[Heading 2]: 研究目的
+[Normal]: 针对金属基复合材料中界面与缺陷大量的原子尺度计算需求，开发金属基复合材料界面与缺陷计算模块生成“LAMMPS开源程序”的分子静力学与分子动力学计算参数输入文件，分别实现界面与缺陷构型的静态优化松弛、微动弹性带计算、动态优化松弛、常应变率加载及常应力加载。
+[Heading 2]: 项目指标
+[Normal]: 项目技术指标，如表1所示。
+[表1]: 项目技术指标
+[Heading 1]: 研究内容
+[Heading 2]: 模块介绍
+[Normal]: 本模块可快速生成针对金属基复合材料中界面与缺陷原子尺度计算的“LAMMPS开源程序”输入文件，其运行逻辑如图1所示，程序可生成分子静力学与分子动力学计算参数输入文件。分子静力学计算包括静态优化松弛与微动弹性带计算，其中微动弹性带计算中始、末态构型文件由静态优化松弛得到。分子动力学计算可进行特定温度下动态优化松弛及常应变率/常应力加载，其中加载模拟中初始构型文件由动态优化松弛得到。
+[图1]: 金属基复合材料中界面与缺陷计算模块运行逻辑
+[Normal]: 3.1.1 界面与缺陷构型静态优化松弛计算
+[Normal]: 模块可根据用户输入的界面类型（如共格界面、半共格界面、非共格界面）、缺陷类型及关键结构参数（如界面取向差、缺陷尺寸/浓度），自动构建原子尺度初始构型；通过集成嵌入原子势（EAM）、修正嵌入原子势（MEAM）等适用于金属基复合材料的原子间相互作用势函数库，自动匹配最优势函数参数，生成包含原子坐标、势函数参数、边界条件、弛豫算法（如共轭梯度法）、能量与力收敛判据等关键信息的LAMMPS输入文件。该功能可实现界面与缺陷初始构型的能量最小化与结构稳定化，为后续精准计算提供可靠的初始原子结构。
+[Normal]: 3.1.2 微动弹性带（NEB）计算
+[Normal]: 针对界面扩散、缺陷迁移等势垒类问题，模块内置微动弹性带算法参数化配置模块，支持用户自定义迁移路径节点数量、初始路径生成方式、弹簧常数等关键参数。通过自动化生成LAMMPS输入文件，可精准计算界面原子扩散、位错穿越界面、空位迁移等过程的能量势垒与最优迁移路径，为揭示界面与缺陷的动态演化机制提供定量的原子尺度能量数据。
+[Normal]: 3.1.3 界面与缺陷构型动态优化松弛计算
+[Normal]: 针对动态条件下的界面与缺陷结构演化研究，模块可自动配置分子动力学计算参数，包括模拟系综（NVE、NVT、NPT）、时间步长、模拟温度/压力控制方式（如Nosé-Hoover热浴、Andersen热浴）、弛豫时间等。生成的LAMMPS输入文件可实现动态条件下界面与缺陷构型的自适应松弛，消除初始构型中的应力集中，获得与实际热力学平衡状态一致的原子结构，为后续动态力学行为计算奠定基础。
+[Normal]: 3.1.4 常应变率加载计算
+[Normal]: 模块支持用户自定义加载方向（如沿界面法向、平行于界面方向）、应变率大小（10⁸-10¹⁰ s⁻¹典型原子尺度模拟应变率范围）、加载步长及终止条件，自动生成包含加载控制参数的LAMMPS输入文件。该功能可实现界面与缺陷构型在准静态加载条件下的原子尺度力学响应模拟，精准获取应力-应变曲线、原子位移场、界面分离/缺陷演化临界应力等关键数据，为解析复合材料界面结合强度、缺陷对力学性能的影响机制提供支撑。
+[Normal]: 3.1.5 常应力加载计算
+[Normal]: 针对恒定载荷条件下的界面与缺陷动态演化研究，模块可配置恒定应力加载参数，包括加载应力大小、加载方向、应力保持时间、模拟系综参数等，自动化生成LAMMPS输入文件。通过该功能可模拟实际服役载荷下界面的动态响应、缺陷的萌生与扩展过程，捕捉界面脱粘、裂纹扩展等关键失效行为的原子尺度特征，为复合材料的失效机制解析与寿命预测提供原子尺度计算依据。
+[Heading 2]: 算例描述
+[Normal]: 本部分以常见的铝镁（Al-Mg）合金与硼化钛增强钛基（Ti/TiB2）复合材料的微观模拟为例，展示本模块可快速生成用以“LAMMPS”模拟的输入文件。
+[Normal]: 3.2.1 Al-Mg体系静态优化松弛模拟设置
+[Normal]: 以Al基体中Mg固溶原子静态优化松弛模拟为例，设置顺序为：i）选择“Molecular Statics”进行分子静力学计算；ii）选择“Minimization”进行静态优化松弛；iii）输入“0 0”不固定原子，选择“Al-Mg”体系，输入“Al Mg”为元素顺序；iv）选择“No”不进行中间状态输出；v）输入“1E-9 1E-9 10000 10000”为收敛准则。输出的“in.lammps”文件如图2所示，可直接用于Al基体中Mg固溶原子静态优化松弛。
+[图1]: Al基体中Mg固溶原子静态优化松弛模拟“in.lammps”文件
+[Normal]: 3.2.2 Al-Mg体系微动弹性带计算设置
+[Normal]: 以Al基体中Mg元素偏聚的位错迁移的微动弹性带计算为例，设置顺序为：i）选择“Molecular Statics”进行分子静力学计算；ii）选择“NEB Calculation”进行微动弹性带计算；iii）输入“0 1942”固定模型外围原子，选择“Al-Mg”体系，输入“Al Mg”为元素顺序；iv）输入“0 1E-5 1000 500 50 data.final”为收敛准则。输出的“in.lammps”文件如图3所示，可直接用于Al基体中Mg元素偏聚的位错迁移的微动弹性带计算。
+[图1]: Al基体中Mg元素偏聚的位错迁移的微动弹性带计算“in.lammps”文件
+[Normal]: 3.2.3 Ti/TiB2体系动态优化松弛模拟设置
+[Normal]: 以Ti/TiB2异质界面动态优化松弛模拟为例，设置顺序为：i）选择“Molecular Dynamics”进行分子动力学计算；ii）选择“Relaxation”进行动态优化松弛，输入“300”为优化温度；iii）输入“0 0”不固定原子，选择“Ti-B”体系，输入“Ti Ti B”为元素顺序；iv）选择“No”不进行中间状态输出；v）输入“10000”为优化步数。输出的“in.lammps”文件如图4所示，可直接用于Ti/TiB2异质界面动态优化松弛模拟。
+[图1]: Ti/TiB2异质界面动态优化松弛模拟“in.lammps”文件
+[Normal]: 3.2.4 Ti/TiB2体系常应力加载模拟设置
+[Normal]: 以Ti单晶中位错迁移的常应力加载模拟为例，设置顺序为：i）选择“Molecular Dynamics”进行分子动力学计算；ii）选择“Loading”及“Constant Stress”进行常应力加载模拟，输入“300”为加载温度；iii）输入“0 1429”固定模型外围原子，选择“Ti-B”体系，输入“Ti B”为元素顺序；iv）选择“Yes”及“2000”每2000步进行一次中间状态输出；v）输入“0 0 0 0.8 0 0”进行0.8GPa的剪切加载；vi）输入“100000”为加载步数。输出的“in.lammps”文件如图5所示，可直接用于Ti单晶中位错迁移的常应力加载模拟。
+[图1]: Ti单晶中位错迁移的常应力加载模拟“in.lammps”文件
+[Normal]: 3.2.5 Ti/TiB2体系常应变率加载模拟设置
+[Normal]: 以Ti中位错-TiB2增强体交互的常应变率加载模拟为例，设置顺序为：i）选择“Molecular Dynamics”进行分子动力学计算；ii）选择“Loading”及“Constant Stress”进行常应力加载模拟，输入“300”为加载温度；iii）输入“0 43559”固定模型外围原子，选择“Ti-B”体系，输入“Ti Ti B”为元素顺序；iv）选择“Yes”及“2000”每2000步进行一次中间状态输出；v）输入“xy”及“5E-4”进行常应变率的剪切加载；vi）输入“200000”为加载步数。输出的“in.lammps”文件如图6所示，可直接用于Ti中位错-TiB2增强体交互的常应变率加载模拟。
+[图1]: Ti中位错-TiB2增强体交互常应变率加载模拟“in.lammps”文件
+[Heading 1]: 结论
+[Normal]: （1）开发的计算模块可以快速生成针对针对金属基复合材料中界面与缺陷原子尺度计算的“LAMMPS开源程序”输入文件，用于静态优化松弛、微动弹性带计算、动态优化松弛、常应变率加载、常应力加载计算；
+[Normal]: （2）开发的计算模块成功用于Al-Mg合金以及Ti/TiBx复合材料的输入文件生成，经过测试，软件各功能正常运行，快速生成的输入文件能正常运用于计算科研工作。
+[Heading 1]: 附件
+[Heading 2]: 《金属基复合材料原子尺度构型设计软件》著作权登记证书
+[Normal]: 金属基复合材料原子尺度设计，已申请计算机软件著作权：金属基复合材料原子尺度构型设计软件V1.0，证书如下：
+[Normal]: 《金属基复合材料原子尺度构型设计软件》登记证书
+[Heading 2]: 《金属基复合材料原子尺度构型设计软件》第三方测评报告
+[Normal]: 委托湖南卓码软件测评有限公司，按照GB/T 25000.51-2016《系统与软件工程系统与软件质量要求和评价（SQuaRE）第51部分：就绪可用软件产品（RUSP）的质量要求和测试细则》中的条款，结合《HNZM_ZY_002_软件产品检测作业指导书Ⅱ》对软件的功能性和性能效率进行测试。软件测试报告部分内容如下：
+[Heading 1]: 附表
+[Heading 2]: “金属基复合材料中界面与缺陷计算模块”源代码
+[Normal]: c**************************************************
+[Normal]: c programed by Mingyu on 02/16/23 in SJTU
+[Normal]: c create lammps input files
+[Normal]: c 1, 2 for minimization, NEB and loading
+[Normal]: c**************************************************
+[Normal]: program input_file
+[Normal]: implicit real*8 (a-h,o-z)
+[Normal]: implicit integer (i-n)
+[Normal]: write(*,*)'Enter simulation type:'
+[Normal]: write(*,*)'(1)Molecular Statics (2)Molecular Dynamics'
+[Normal]: read(*,*)isimu_type
+[Normal]: if (isimu_type.eq.1) then
+[Normal]: write(*,*)'Enter file type:'
+[Normal]: write(*,*)'(1)Minimization (2)NEB '
+[Normal]: read(*,*)ifile_type
+[Normal]: elseif (isimu_type.eq.2) then
+[Normal]: write(*,*)'(1)Relaxation (2)Loading'
+[Normal]: read(*,*)ifile_type
+[Normal]: write(*,*)'Enter temperture (K):'
+[Normal]: read(*,*)i_temp
+[Normal]: if (ifile_type.eq.2) then
+[Normal]: write(*,*)'Enter loading type:'
+[Normal]: write(*,*)'(1)Constant strain rate (2)Constant Stress'
+[Normal]: read(*,*)iload_type
+[Normal]: endif
+[Normal]: endif
+[Normal]: write(*,*)'Enter element system:'
+[Normal]: write(*,*)'(1)Al-Mg (2)C-Si-Al (3)Cu-C (4)Ti-B'
+[Normal]: read(*,*)isystem_type
+[Normal]: if (isimu_type.eq.1 .and. ifile_type.eq.1) then
+[Normal]: write(*,*)'------------------Minimization------------------'
+[Normal]: call MINIMIZE(isystem_type)
+[Normal]: write(*,*)'----------------------Note----------------------'
+[Normal]: write(*,*)'File {data.struct} is needed:'
+[Normal]: write(*,*)'Use file (final.result} for Post-Processing'
+[Normal]: elseif (simu_type.eq.1 .and. ifile_type.eq.2) then
+[Normal]: write(*,*)'----------------------NEB-----------------------'
+[Normal]: call NEB(isystem_type)
+[Normal]: write(*,*)'----------------------Note----------------------'
+[Normal]: write(*,*)'Files {data.struct} and {data.final} are needed:'
+[Normal]: write(*,*)'Use file (log.lammps} for Post-Processing'
+[Normal]: elseif (isimu_type.eq.2 .and. ifile_type.eq.2 .and.
+[Normal]: $            iload_type.eq.2) then
+[Normal]: call LOADING(isystem_type)
+[Normal]: write(*,*)'--------------------LOADING---------------------'
+[Normal]: write(*,*)'File {data.struct} is needed:'
+[Normal]: write(*,*)'Use file (final.result} for Post-Processing'
+[Normal]: endif
+[Normal]: write(*,*)'----------------------Done----------------------'
+[Normal]: end
+[Normal]: SUBROUTINE MINIMIZE(isystem_type)
+[Normal]: implicit real*8 (a-h,o-z)
+[Normal]: implicit integer (i-n)
+[Normal]: write(*,*)'Enter fixed atom #: start end'
+[Normal]: read(*,*)ifix_start,ifix_end
+[Normal]: open(unit=1,file='in.lammps',status='unknown')
+[Normal]: write(1,'(A)')'#Minimize structures'
+[Normal]: write(1,'(A)')'units          metal'
+[Normal]: write(1,'(A)')'atom_style     atomic'
+[Normal]: write(1,'(A)')'boundary       p p p'
+[Normal]: write(1,'(A)')'timestep       0.001'
+[Normal]: write(1,'(A)')'read_data      data.struct'
+[Normal]: write(1,'(A)')' '
+[Normal]: if (ifix_start.eq.0) then
+[Normal]: ntmp1=NINT(LOG10(REAL(1)))+2
+[Normal]: elseif (ifix_start.lt.0) then
+[Normal]: ntmp1=NINT(LOG10(REAL(-1*ifix_start)))+3
+[Normal]: else
+[Normal]: ntmp1=NINT(LOG10(REAL(ifix_start)))+2
+[Normal]: endif
+[Normal]: if (ifix_end.eq.0) then
+[Normal]: ntmp2=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (ifix_end.lt.0) then
+[Normal]: ntmp2=NINT(LOG10(REAL(-1*ifix_end)))+2
+[Normal]: else
+[Normal]: ntmp2=NINT(LOG10(REAL(ifix_end)))+1
+[Normal]: endif
+[Normal]: write(1,'(A,i<ntmp1>,A,i<ntmp2>)')
+[Normal]: $               'group          region1 id',
+[Normal]: $               ifix_start,':',ifix_end
+[Normal]: write(1,'(A)')'group          region2 subtract all region1'
+[Normal]: write(1,'(A)')' '
+[Normal]: if (isystem_type.eq.1) then !create potential settings
+[Normal]: write(1,'(A)')'pair_style     eam/alloy'
+[Normal]: write(1,'(A,A)')'pair_coeff     * * pot/almg.liu.eam.alloy',
+[Normal]: $                   ' Al Mg'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: elseif (isystem_type.eq.2) then
+[Normal]: write(1,'(A,A)')'pair_style     hybrid',
+[Normal]: $                   ' tersoff eam/alloy morse3.0'
+[Normal]: write(1,'(A,A)')'pair_coeff     * * tersoff SiC.tersoff',
+[Normal]: $                   ' C Si NULL'
+[Normal]: write(1,'(A,A)')'pair_coeff     eam/alloy',
+[Normal]: $                   ' Al_Winey.eam.alloy NULL NULL Al'
+[Normal]: write(1,'(A,A)')'pair_coeff     1 3 morse',
+[Normal]: $                   ' 0.4691 1.738 2.246'
+[Normal]: write(1,'(A,A)')'pair_coeff     2 3 morse',
+[Normal]: $                   ' 0.4824 1.322 2.92'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: elseif (isystem_type.eq.3) then
+[Normal]: write(1,'(A)')'pair_style     hybrid lj/cut 8.0 eam airebo 3.0'
+[Normal]: write(1,'(A)')'pair_coeff     1 2 lj/cut 0.02578 3.0825'
+[Normal]: write(1,'(A)')'pair_coeff     * * eam Cu_u3.eam'
+[Normal]: write(1,'(A)')'pair_coeff     * * airebo CH.airebo NULL C'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: elseif (isystem_type.eq.4) then
+[Normal]: write(1,'(A)')'pair_style     meam/c'
+[Normal]: write(1,'(A)')
+[Normal]: $              'pair_coeff     * * library.meam B Ti TiB.meam B Ti'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: endif !end create
+[Normal]: write(1,'(A)')' '
+[Normal]: write(1,'(A)')'compute        pot all pe/atom'
+[Normal]: write(1,'(A)')'thermo         100'
+[Normal]: write(1,'(A,A)')'thermo_style   custom',
+[Normal]: $                 ' step temp etotal pxx pyy pzz pxy pxz pyz'
+[Normal]: write(1,'(A)')' '
+[Normal]: write(1,'(A)')'fix            freeze region1 setforce 0 0 0'
+[Normal]: write(1,'(A)')'min_style      fire'
+[Normal]: write(1,'(A)')'minimize       0.0 3.12E-3 100000 100000'
+[Normal]: write(1,'(A,A)')'dump           1 all custom 100 final.result',
+[Normal]: $                 ' id type x y z c_pot'
+[Normal]: write(1,'(A)')'dump_modify    1 sort id'
+[Normal]: write(1,'(A)')'#End of file'
+[Normal]: close(1)
+[Normal]: END
+[Normal]: SUBROUTINE NEB(isystem_type)
+[Normal]: implicit real*8 (a-h,o-z)
+[Normal]: implicit integer (i-n)
+[Normal]: write(*,*)'Enter fixed atom #: start end'
+[Normal]: read(*,*)ifix_start,ifix_end
+[Normal]: open(unit=1,file='in.lammps',status='unknown')
+[Normal]: write(1,'(A)')'#Perform NEB calculation'
+[Normal]: write(1,'(A)')'units          metal'
+[Normal]: write(1,'(A)')'atom_style     atomic'
+[Normal]: write(1,'(A)')'boundary       p p p'
+[Normal]: write(1,'(A)')'timestep       0.001'
+[Normal]: write(1,'(A)')'read_data      data.struct'
+[Normal]: write(1,'(A)')' '
+[Normal]: if (ifix_start.eq.0) then
+[Normal]: ntmp1=NINT(LOG10(REAL(1)))+2
+[Normal]: elseif (ifix_start.lt.0) then
+[Normal]: ntmp1=NINT(LOG10(REAL(-1*ifix_start)))+3
+[Normal]: else
+[Normal]: ntmp1=NINT(LOG10(REAL(ifix_start)))+2
+[Normal]: endif
+[Normal]: if (ifix_end.eq.0) then
+[Normal]: ntmp2=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (ifix_end.lt.0) then
+[Normal]: ntmp2=NINT(LOG10(REAL(-1*ifix_end)))+2
+[Normal]: else
+[Normal]: ntmp2=NINT(LOG10(REAL(ifix_end)))+1
+[Normal]: endif
+[Normal]: write(1,'(A,i<ntmp1>,A,i<ntmp2>)')
+[Normal]: $               'group          region1 id',
+[Normal]: $               ifix_start,':',ifix_end
+[Normal]: write(1,'(A)')'group          region2 subtract all region1'
+[Normal]: write(1,'(A)')' '
+[Normal]: if (isystem_type.eq.1) then !create potential settings
+[Normal]: write(1,'(A)')'pair_style     eam/alloy'
+[Normal]: write(1,'(A,A)')'pair_coeff     * * pot/almg.liu.eam.alloy',
+[Normal]: $                   ' Al Mg Zn'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: elseif (isystem_type.eq.2) then
+[Normal]: write(1,'(A,A)')'pair_style     hybrid',
+[Normal]: $                   ' tersoff eam/alloy morse3.0'
+[Normal]: write(1,'(A,A)')'pair_coeff     * * tersoff SiC.tersoff',
+[Normal]: $                   ' C Si NULL'
+[Normal]: write(1,'(A,A)')'pair_coeff     eam/alloy',
+[Normal]: $                   ' Al_Winey.eam.alloy NULL NULL Al'
+[Normal]: write(1,'(A,A)')'pair_coeff     1 3 morse',
+[Normal]: $                   ' 0.4691 1.738 2.246'
+[Normal]: write(1,'(A,A)')'pair_coeff     2 3 morse',
+[Normal]: $                   ' 0.4824 1.322 2.92'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: elseif (isystem_type.eq.3) then
+[Normal]: write(1,'(A)')'pair_style     hybrid lj/cut 8.0 eam airebo 3.0'
+[Normal]: write(1,'(A)')'pair_coeff     1 2 lj/cut 0.02578 3.0825'
+[Normal]: write(1,'(A)')'pair_coeff     * * eam Cu_u3.eam'
+[Normal]: write(1,'(A)')'pair_coeff     * * airebo CH.airebo NULL C'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: elseif (isystem_type.eq.4) then
+[Normal]: write(1,'(A)')'pair_style     meam/c'
+[Normal]: write(1,'(A)')
+[Normal]: $              'pair_coeff     * * library.meam B Ti TiB.meam B Ti'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: endif ! end create
+[Normal]: write(1,'(A)')'thermo         100'
+[Normal]: write(1,'(A)')''
+[Normal]: write(1,'(A)')'fix            freeze region1 setforce 0 0 0'
+[Normal]: write(1,'(A)')'min_style      fire'
+[Normal]: write(1,'(A)')'fix            2 all neb 1.0 parallel ideal'
+[Normal]: write(1,'(A,A)')'neb            0 0.001 1000 500 50 final',
+[Normal]: $                 ' data.final'
+[Normal]: write(1,'(A)')'#End of file'
+[Normal]: close(1)
+[Normal]: END
+[Normal]: SUBROUTINE LOADING(isystem_type)
+[Normal]: implicit real*8 (a-h,o-z)
+[Normal]: implicit integer (i-n)
+[Normal]: write(*,*)'Enter fixed atom #: start end'
+[Normal]: read(*,*)ifix_start,ifix_end
+[Normal]: write(*,*)'Enter load (bars): xx yy zz xy xz yz'
+[Normal]: read(*,*)i_xx,i_yy,i_zz,i_xy,i_xz,i_yz
+[Normal]: write(*,*)'Enter temperture (K): Tload'
+[Normal]: read(*,*)i_temp
+[Normal]: write(*,*)'Enter running step: nstep'
+[Normal]: read(*,*)n_step
+[Normal]: open(unit=1,file='in.lammps',status='unknown')
+[Normal]: write(1,'(A)')'#Minimize structures'
+[Normal]: write(1,'(A)')'units          metal'
+[Normal]: write(1,'(A)')'atom_style     atomic'
+[Normal]: write(1,'(A)')'boundary       p p p'
+[Normal]: write(1,'(A)')'timestep       0.001'
+[Normal]: write(1,'(A)')'read_data      data.struct'
+[Normal]: write(1,'(A)')' '
+[Normal]: if (ifix_start.eq.0) then
+[Normal]: ntmp1=NINT(LOG10(REAL(1)))+2
+[Normal]: elseif (ifix_start.lt.0) then
+[Normal]: ntmp1=NINT(LOG10(REAL(-1*ifix_start)))+3
+[Normal]: else
+[Normal]: ntmp1=NINT(LOG10(REAL(ifix_start)))+2
+[Normal]: endif
+[Normal]: if (ifix_end.eq.0) then
+[Normal]: ntmp2=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (ifix_end.lt.0) then
+[Normal]: ntmp2=NINT(LOG10(REAL(-1*ifix_end)))+2
+[Normal]: else
+[Normal]: ntmp2=NINT(LOG10(REAL(ifix_end)))+1
+[Normal]: endif
+[Normal]: if (i_temp.eq.0) then
+[Normal]: ntmp3=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (i_temp.lt.0) then
+[Normal]: ntmp3=NINT(LOG10(REAL(-1*i_temp)))+2
+[Normal]: else
+[Normal]: ntmp3=NINT(LOG10(REAL(i_temp)))+1
+[Normal]: endif
+[Normal]: if (i_xx.eq.0) then
+[Normal]: ntmp4=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (i_xx.lt.0) then
+[Normal]: ntmp4=NINT(LOG10(REAL(-1*i_xx)))+2
+[Normal]: else
+[Normal]: ntmp4=NINT(LOG10(REAL(i_xx)))+1
+[Normal]: endif
+[Normal]: if (i_yy.eq.0) then
+[Normal]: ntmp5=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (i_yy.lt.0) then
+[Normal]: ntmp5=NINT(LOG10(REAL(-1*i_yy)))+2
+[Normal]: else
+[Normal]: ntmp5=NINT(LOG10(REAL(i_yy)))+1
+[Normal]: endif
+[Normal]: if (i_zz.eq.0) then
+[Normal]: ntmp6=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (i_zz.lt.0) then
+[Normal]: ntmp6=NINT(LOG10(REAL(-1*i_zz)))+2
+[Normal]: else
+[Normal]: ntmp6=NINT(LOG10(REAL(i_zz)))+1
+[Normal]: endif
+[Normal]: if (i_xy.eq.0) then
+[Normal]: ntmp7=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (i_xy.lt.0) then
+[Normal]: ntmp7=NINT(LOG10(REAL(-1*i_xy)))+2
+[Normal]: else
+[Normal]: ntmp7=NINT(LOG10(REAL(i_xy)))+1
+[Normal]: endif
+[Normal]: if (i_xz.eq.0) then
+[Normal]: ntmp8=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (i_xz.lt.0) then
+[Normal]: ntmp8=NINT(LOG10(REAL(-1*i_xz)))+2
+[Normal]: else
+[Normal]: ntmp8=NINT(LOG10(REAL(i_xz)))+1
+[Normal]: endif
+[Normal]: if (i_yz.eq.0) then
+[Normal]: ntmp9=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (i_yz.lt.0) then
+[Normal]: ntmp9=NINT(LOG10(REAL(-1*i_yz)))+2
+[Normal]: else
+[Normal]: ntmp9=NINT(LOG10(REAL(i_yz)))+1
+[Normal]: endif
+[Normal]: if (n_step.eq.0) then
+[Normal]: ntmp10=NINT(LOG10(REAL(1)))+1
+[Normal]: elseif (n_step.lt.0) then
+[Normal]: ntmp10=NINT(LOG10(REAL(-1*n_step)))+2
+[Normal]: else
+[Normal]: ntmp10=NINT(LOG10(REAL(n_step)))+1
+[Normal]: endif
+[Normal]: write(1,'(A,i<ntmp1>,A,i<ntmp2>)')
+[Normal]: $               'group          region1 id',
+[Normal]: $               ifix_start,':',ifix_end
+[Normal]: write(1,'(A)')'group          region2 subtract all region1'
+[Normal]: write(1,'(A)')' '
+[Normal]: if (isystem_type.eq.1) then !create potential settings
+[Normal]: write(1,'(A)')'pair_style     eam/alloy'
+[Normal]: write(1,'(A,A)')'pair_coeff     * * pot/almg.liu.eam.alloy',
+[Normal]: $                   ' Al Mg'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: elseif (isystem_type.eq.2) then
+[Normal]: write(1,'(A,A)')'pair_style     hybrid',
+[Normal]: $                   ' tersoff eam/alloy morse3.0'
+[Normal]: write(1,'(A,A)')'pair_coeff     * * tersoff SiC.tersoff',
+[Normal]: $                   ' C Si NULL'
+[Normal]: write(1,'(A,A)')'pair_coeff     eam/alloy',
+[Normal]: $                   ' Al_Winey.eam.alloy NULL NULL Al'
+[Normal]: write(1,'(A,A)')'pair_coeff     1 3 morse',
+[Normal]: $                   ' 0.4691 1.738 2.246'
+[Normal]: write(1,'(A,A)')'pair_coeff     2 3 morse',
+[Normal]: $                   ' 0.4824 1.322 2.92'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: elseif (isystem_type.eq.3) then
+[Normal]: write(1,'(A)')'pair_style     hybrid lj/cut 8.0 eam airebo 3.0'
+[Normal]: write(1,'(A)')'pair_coeff     1 2 lj/cut 0.02578 3.0825'
+[Normal]: write(1,'(A)')'pair_coeff     * * eam Cu_u3.eam'
+[Normal]: write(1,'(A)')'pair_coeff     * * airebo CH.airebo NULL C'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: elseif (isystem_type.eq.4) then
+[Normal]: write(1,'(A)')'pair_style     meam/c'
+[Normal]: write(1,'(A)')
+[Normal]: $              'pair_coeff     * * library.meam B Ti TiB.meam B Ti'
+[Normal]: write(1,'(A)')'neighbor       2.0 bin'
+[Normal]: write(1,'(A)')'neigh_modify   every 1 delay 0 check yes'
+[Normal]: endif !end create
+[Normal]: write(1,'(A)')'change_box     triclinic'
+[Normal]: write(1,'(A)')'fix            freeze region1 setforce 0 0 0'
+[Normal]: write(1,'(A,i<ntmp3>,A)')
+[Normal]: $               'velocity       region2 create ',i_temp,
+[Normal]: $               ' 123456 units box'
+[Normal]: write(1,'(A,i<ntmp3>,A,i<ntmp3>,A,i<ntmp4>,A,i<ntmp4>,A,
+[Normal]: $ i<ntmp5>,A,i<ntmp5>,A,i<ntmp6>,A,i<ntmp6>,A,
+[Normal]: $ i<ntmp7>,A,i<ntmp7>,A,i<ntmp8>,A,i<ntmp8>,A,
+[Normal]: $ i<ntmp9>,A,i<ntmp9>,A)')
+[Normal]: $               'fix            load region2 npt temp ',
+[Normal]: $               i_temp,' ',i_temp,' 0.1 x ',
+[Normal]: $               i_xx,' ',i_xx,' 0.1 y ',
+[Normal]: $               i_yy,' ',i_yy,' 0.1 z ',
+[Normal]: $               i_zz,' ',i_zz,' 0.1 xy ',
+[Normal]: $               i_xy,' ',i_xy,' 0.1 xz ',
+[Normal]: $               i_xz,' ',i_xz,' 0.1 yz ',
+[Normal]: $               i_yz,' ',i_yz,' 0.1'
+[Normal]: write(1,'(A)')' '
+[Normal]: write(1,'(A)')'compute        pot all pe/atom'
+[Normal]: write(1,'(A)')'thermo         100'
+[Normal]: write(1,'(A,A)')'thermo_style   custom',
+[Normal]: $                 ' step temp etotal pxx pyy pzz pxy pxz pyz'
+[Normal]: write(1,'(A)')' '
+[Normal]: write(1,'(A,A)')'dump           1 all custom 100 final.result',
+[Normal]: $                 ' id type x y z c_pot'
+[Normal]: write(1,'(A)')'dump_modify    1 sort id'
+[Normal]: write(1,'(A,i<ntmp10>)')
+[Normal]: $               'run            ',n_step
+[Normal]: write(1,'(A)')'#End of file'
+[Normal]: close(1)
+[Normal]: END
+
+--- Tables ---
+
+Table 0:
+  |  |  |  |  |  |  |  |  |
+  |  |  |  | 编    号 | 编    号 | 指标1-1 | 指标1-1 |  |
+  |  |  |  | 密    级 | 密    级 | 公开 | 公开 |  |
+  |  |  |  | 页　　数 | 页　　数 | 35 | 35 |  |
+  |  |  |  |  |  |  |  |  |
+  |  |  |  |  |  |  |  |  |
+  |  |  |  |  |  |  |  |  |
+  |  | 编制单位 |  |  | 上海交通大学 | 上海交通大学 |  |  |
+  |  | 编　　写 |  |  | 龚鸣宇 | 龚鸣宇 |  |  |
+  |  | 校　　对 |  |  | 曹贺 | 曹贺 |  |  |
+  |  | 审　　核 |  |  | 赵蕾 | 赵蕾 |  |  |
+  |  | 批　　准 |  |  | 苏益士 | 苏益士 |  |  |
+  |  |  |  |  |  |  |  |  |
+  | 上海交通大学 材料科学与工程学院 | 上海交通大学 材料科学与工程学院 | 上海交通大学 材料科学与工程学院 | 上海交通大学 材料科学与工程学院 | 上海交通大学 材料科学与工程学院 | 上海交通大学 材料科学与工程学院 | 上海交通大学 材料科学与工程学院 | 上海交通大学 材料科学与工程学院 |
+
+Table 1:
+  | 指标名称 | 完成时
+指标值/状态 | 考核方式（方法）及
+评价手段 |
+  | 指标1. 金属基复合材 料强度/韧性/耐热的 多尺度集成计算模型 | 金属基复合材料界面与缺陷、基体/增强体/界面的温度相关物性/变形参数、构型基元组分热稳定性、构型基元晶体塑性、构型基元热-力耦合特性的多尺度计算模块5 项 | 提供技术报告，
+专家评审考核 |

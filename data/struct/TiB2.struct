@@ -1,0 +1,28 @@
+# Created by Siamak Attarian (siamak-attarian@uiowa.edu)
+# For more information, see below article: 
+# "Development of a 2NN-MEAM potential for Ti-B system and studies of the temperature dependence of the nanohardness of TiB2"
+
+3 atoms
+0 bonds
+0 angles
+0 dihedrals
+0 impropers
+
+2 atom types
+
+0 3.03292 xlo xhi
+0 2.62659 ylo yhi
+0 3.22779 zlo zhi
+-1.51646 0 0 xy xz yz
+
+Masses
+
+ 1 10.811
+ 2 47.880
+
+
+Atoms
+
+1     2 0.000000   0.000000   0.000000
+2     1 -0.000002   1.751058   1.613895
+3     1  1.516462   0.875528   1.613895
