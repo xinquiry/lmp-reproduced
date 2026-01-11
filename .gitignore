@@ -21,7 +21,7 @@ wheels/
 
 # Simulation output (too large for git)
 output/
-simulations/
+/simulations/
 
 # OS files
 .DS_Store
